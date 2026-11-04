@@ -15,25 +15,85 @@ body {
     box-shadow: 0 4px 12px #0002;
 }
 
-/* creates a three column section for the stores on the homepage */
+/* store grid on the home page */
 .storeGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
 }
 
-/* defines the style of each store card on the homepage */
 .storeCard {
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 10px;
+    display: block;
+    background: #fff;
+    border-radius: 15px;
+    padding: 18px;
     text-align: center;
     text-decoration: none;
-    color: green;
+    color: #1c2941;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: box-shadow .15s, transform .15s;
 }
 
-/* shadow when hovering over stores on the home page */
 .storeCard:hover {
-    box-shadow: 0 4px 12px black;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+    color: #ff5e00;
+}
+
+/* ===== SmartBase theme (shared by all pages) ===== */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-custom {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 15px 20px;
+}
+.nav-link {
+    font-weight: 500;
+    color: #4a5568 !important;
+    margin-right: 15px;
+}
+.nav-link:hover {
+    color: #ff1818 !important;
+}
+.btn-primary-custom {
+    background-color: #ffb618;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    color: #000;
+    font-weight: 600;
+}
+.btn-primary-custom:hover {
+    background-color: #e5a315;
+    color: #000;
+}
+.dashboard-card {
+    background: white;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    padding: 20px;
+    height: 100%;
+}
+.gradient-card {
+    background: linear-gradient(135deg, #ffb618 0%, #ff5e00 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+}
+.dropdown-menu {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.dropdown-item {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.dropdown-item:hover {
+    background-color: #fff4e5;
+    color: #ff5e00;
 }
