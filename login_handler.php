@@ -19,7 +19,7 @@
         $hash = $row[0];
 
         if(password_verify($password, $hash)) {
-            echo "<h1>True</h2>";
+            header("Location: index.php");
         } else {
             header("Location: login.php");
             echo "<h3>Authentication failed, try again.</h3>";
