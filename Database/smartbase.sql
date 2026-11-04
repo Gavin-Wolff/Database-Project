@@ -81,6 +81,17 @@ CREATE TABLE `storeitem` (
   `ProductRating` decimal(2,1) NOT NULL DEFAULT 4.0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Table structore  for table `users`
+
+CREATE TABLE `users` (
+    `UID` int(11) NOT NULL,
+    `FName` varchar(100) NOT NULL,
+    `LName` varchar(100) NOT NULL,
+    `Email` varchar(100) NOT NULL,
+    `Password` varchar(200) NOT NULL,
+    `CreateTime` datetime DEFAULT CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -114,6 +125,13 @@ ALTER TABLE `storeitem`
   ADD KEY `fk_storecategory_category` (`ItemID`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+    ADD PRIMARY KEY (`UID`),
+    ADD UNIQUE KEY (`Email`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -134,6 +152,19 @@ ALTER TABLE `location`
 --
 ALTER TABLE `store`
   MODIFY `StoreID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+    MODIFY `UID` int(11) NOT NULL AUTO_INCREMENT;
+
+-- 
+-- Binary collation for `users.Password`
+--
+ALTER TABLE `users`
+    MODIFY `Password` VARCHAR(200)
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;
 
 --
 -- Constraints for dumped tables
