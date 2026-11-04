@@ -24,7 +24,7 @@ $result = $conn->query($sql);
 
     <header class="bg-success text-white p-2">
         <div class="container d-flex justify-content-between align-items-center">
-            <h1>Smartbase Store Finder</h1>
+            <h1 class="text-white">Smartbase Store Finder</h1>
 
             <nav class="d-flex gap-5">
                 <a href="search.php" class="text-white text-decoration-none">
@@ -54,6 +54,10 @@ $result = $conn->query($sql);
 
                     <a href="search.php?store=<?php echo urlencode($store['Name']); ?>"
                        class="storeCard">
+
+                        <div class="store-image">
+                            Store Image
+                        </div>
 
                         <h3><?php echo htmlspecialchars($store['Name']); ?></h3>
 

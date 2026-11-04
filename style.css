@@ -37,3 +37,8 @@ body {
 .storeCard:hover {
     box-shadow: 0 4px 12px black;
 }
+
+.store-image {
+    height: 100px;
+    background-color: #e8edf2;
+}
