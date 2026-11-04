@@ -100,15 +100,25 @@ $suggestions = $conn->query(
 <body class="bg-light">
 
 <!-- Green header -->
-<header class="bg-success text-white p-3">
-    <div class="container d-flex justify-content-between align-items-center">
-        <h1>Smartbase Food Finder</h1>
+<header class="bg-success text-white p-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="text-white">Smartbase Store Finder</h1>
 
-        <a href="index.php" class="btn btn-outline-light">
-            Back to Home
-        </a>
-    </div>
-</header>
+            <nav class="d-flex gap-5">
+                <a href="index.php" class="text-white text-decoration-none">
+                    Home
+                </a>
+
+                <a href="login.php" class="text-white text-decoration-none">
+                    Log In
+                </a>
+
+                <a href="register.php" class="text-white text-decoration-none">
+                    Register
+                </a>
+            <nav>
+        </div>
+    </header>
 
 <main class="container py-4">
 
