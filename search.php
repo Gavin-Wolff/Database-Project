@@ -88,27 +88,20 @@ $suggestions = $conn->query(
 
 <head>
     <meta charset="UTF-8">
-    <title>Smartbase Store Finder</title>
+    <title>Search | SmartBase</title>
 
     <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Custom styling -->
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="bg-light">
+<body>
 
-<!-- Green header -->
-<header class="bg-success text-white p-3">
-    <div class="container d-flex justify-content-between align-items-center">
-        <h1>Smartbase Food Finder</h1>
-
-        <a href="index.php" class="btn btn-outline-light">
-            Back to Home
-        </a>
-    </div>
-</header>
+<?php include 'navbar.php'; ?>
 
 <main class="container py-4">
 
@@ -133,7 +126,7 @@ $suggestions = $conn->query(
                 <?php endwhile; ?>
             </datalist>
 
-            <button class="btn btn-success">
+            <button class="btn btn-primary-custom">
                 Search
             </button>
 
@@ -147,7 +140,7 @@ $suggestions = $conn->query(
         <input type="hidden" name="keyword"
                value="<?= htmlspecialchars($keyword) ?>">
 
-        <div class="card mb-4">
+        <div class="dashboard-card mb-4">
             <div class="card-body">
 
                 <h5>Filter by Store</h5>
@@ -171,7 +164,7 @@ $suggestions = $conn->query(
 
                 <br>
 
-                <button class="btn btn-success mt-3">
+                <button class="btn btn-primary-custom mt-3">
                     Apply Filters
                 </button>
 
@@ -197,7 +190,7 @@ $suggestions = $conn->query(
 
                 <div class="col-12 col-sm-6 col-lg-3">
 
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius:15px">
 
                         <!-- Picture placeholder -->
                         <div class="product-image">
@@ -259,5 +252,6 @@ $suggestions = $conn->query(
 
 </main>
 
+<?php include 'modals.php'; ?>
 </body>
 </html>
