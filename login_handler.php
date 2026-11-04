@@ -1,33 +1,29 @@
 <?php
-    require_once 'db.php';
+session_start();
+require_once 'db.php';
 
-    if(!isset($_POST['email']) || !isset($_POST['password'])) {
-        header("Location: login.php");
-        echo "<h2>There was a problem with your input. Try again.</h2>";
-        exit;
-    }
+function back($type, $msg) {
+    $_SESSION['flash'] = ['type' => $type, 'msg' => $msg];
+    header("Location: home.php");
+    exit;
+}
 
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
+if ($email === '' || $password === '') {
+    back('danger', 'Please enter your email and password.');
+}
 
-    try {
-        $sql = "SELECT Password FROM users WHERE Email='$email'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_row();
-        $hash = $row[0];
+$stmt = $conn->prepare("SELECT UID, FName, Password FROM users WHERE Email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$row = $stmt->get_result()->fetch_assoc();
 
-        if(password_verify($password, $hash)) {
-            echo "<h1>True</h2>";
-        } else {
-            header("Location: login.php");
-            echo "<h3>Authentication failed, try again.</h3>";
-        }
-        exit;
-    } catch (Throwable $e) {
-        //header("Location: register.php");
-        echo "Database error: " . $e->getMessage();
-        //exit;
-    }
-?>
+if ($row && password_verify($password, $row['Password'])) {
+    session_regenerate_id(true);
+    $_SESSION['uid'] = $row['UID'];
+    $_SESSION['name'] = $row['FName'];
+    back('success', 'Welcome back, ' . $row['FName'] . '!');
+}
+
+back('danger', 'Incorrect email or password.');
