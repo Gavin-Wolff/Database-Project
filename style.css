@@ -14,3 +14,26 @@ body {
 .card:hover {
     box-shadow: 0 4px 12px #0002;
 }
+
+/* creates a three column section for the stores on the homepage */
+.storeGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 10px;
+}
+
+/* defines the style of each store card on the homepage */
+.storeCard {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: green;
+}
+
+/* shadow when hovering over stores on the home page */
+.storeCard:hover {
+    box-shadow: 0 4px 12px black;
+}

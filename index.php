@@ -12,69 +12,71 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Smartbase Store Finder</title>
+
+    <!-- Bootstrap styling -->
+    <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.min.css">
+
+    <!-- Custom styling -->
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="bg-light d-flex flex-column min-vh-100">
 
-    <header>
-        <h1>Smartbase Store Finder</h1>
-        <p>Find products and compare stores.</p>
+    <header class="bg-success text-white p-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1>Smartbase Store Finder</h1>
+
+            <nav class="d-flex gap-5">
+                <a href="search.php" class="text-white text-decoration-none">
+                    Search
+                </a>
+
+                <a href="login.php" class="text-white text-decoration-none">
+                    Log In
+                </a>
+
+                <a href="register.php" class="text-white text-decoration-none">
+                    Register
+                </a>
+            <nav>
+        </div>
     </header>
 
-    <main>
+    <main class="container py-2 flex-grow-1">
 
         <h2>Select a Store</h2>
 
-        <table>
-            <?php
-            $columnCount = 0;
+        <div class="storeGrid">
 
-            //make sure there are database results.
-            if ($result && $result->num_rows > 0) {
+            <?php if ($result && $result->num_rows > 0) { ?>
 
+                <?php while ($store = $result->fetch_assoc()) { ?>
 
-                while ($store = $result->fetch_assoc()) {
+                    <a href="search.php?store=<?php echo urlencode($store['Name']); ?>"
+                       class="storeCard">
 
-                    // start of row every three columns
-                    if ($columnCount % 3 == 0) {
-                        echo "<tr>";
-                    }
-            ?>
-
-                <!-- each store in their card -->
-                <td>
-                    <a href="search.php?store=<?php echo urlencode($store['Name']); ?>">
                         <h3><?php echo htmlspecialchars($store['Name']); ?></h3>
+
+                        <p><?php echo htmlspecialchars($store['HoursOfOperation']); ?></p>
+
                     </a>
-                    <!-- store hours under the name -->
-                    <p><?php echo htmlspecialchars($store['HoursOfOperation']); ?></p>
-                </td>
 
-            <?php
-                    $columnCount++;
+                <?php } ?>
 
-                    // end of row every three columns
-                    if ($columnCount % 3 == 0) {
-                        echo "</tr>";
-                    }
-                }
+            <?php } else { ?>
 
-                // end of last row if it has less than three stores
-                if ($columnCount % 3 != 0) {
-                    echo "</tr>";
-                }
+                <p>No stores found.</p>
 
-            } else {
-                echo "<tr><td>No stores found.</td></tr>";
-            }
-            ?>
-        </table>
+            <?php } ?>
 
     </main>
 
-    <footer>
-        <p>Smartbase Store Finder</p>
+    <footer class="bg-dark text-white mt-10">
+
+        <div class="container text-center">
+            <p class="mb-1">Smartbase Store Finder</p>
+        </div>
+    
     </footer>
 
 </body>
