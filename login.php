@@ -12,7 +12,7 @@ require_once 'db.php';
         <link rel="stylesheet" href="style.css">
     </head>
 
-  // at the moment this is very raw. will style it more later
+    <!-- at the moment this is very raw. will style it more later -->
     <body class="bg-light d-flex flex-column min-vh-100">
 
         <header class="bg-success text-white p-2">
