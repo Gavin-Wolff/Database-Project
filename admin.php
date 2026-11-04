@@ -32,9 +32,6 @@ require_once 'db.php';
         </header>
         <br>
         <div>
-            <div style="display: flex; justify-content: center;">
-                <a href="index.php" style="text-decoration: none;">Back to Dashboard</a>
-            </div>
 			<br>
             <div style="display: flex; justify-content: center;">
                 <h3>Update your Information</h3>
