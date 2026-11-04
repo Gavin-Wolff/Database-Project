@@ -88,7 +88,7 @@ $suggestions = $conn->query(
 
 <head>
     <meta charset="UTF-8">
-    <title>Smartbase Food Finder</title>
+    <title>Smartbase Store Finder</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.min.css">
