@@ -1,29 +1,31 @@
 <?php
-    require_once 'db.php';
+session_start();
+require_once 'db.php';
 
-    if(!isset($_POST['fname']) || !isset($_POST['lname']) || !isset($_POST['email']) || !isset($_POST['password'])) {
-        echo "<h2>There was a problem with your input. Try again.</h2>";
-        header("Location: register.php");
-        exit;
-    }
+function back($type, $msg) {
+    $_SESSION['flash'] = ['type' => $type, 'msg' => $msg];
+    header("Location: home.php");
+    exit;
+}
 
-    $fname = $_POST['fname'];
-    $lname = $_POST['lname'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    // we use argon2id salted hash rather than plain text passwords
-    $p_hash = password_hash($password, PASSWORD_ARGON2ID);
+$fname = trim($_POST['fname'] ?? '');
+$lname = trim($_POST['lname'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
 
-    try {
-        $sql = "INSERT INTO users (FName, LName, Email, Password) VALUES ('$fname', '$lname', '$email', '$p_hash');";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        header("Location: login.php");
-        exit;
-    } catch (Exception $e) {
-        header("Location: register.php");
-        echo "Database error: " . $e->getMessage();
-        exit;
-    }
-?>
+if ($fname === '' || $lname === '' || $email === '' || strlen($password) < 8) {
+    back('danger', 'Please fill in every field (password needs 8+ characters).');
+}
+
+// argon2id salted hash rather than plain text
+$hash = password_hash($password, PASSWORD_ARGON2ID);
+
+try {
+    $stmt = $conn->prepare("INSERT INTO users (FName, LName, Email, Password) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $fname, $lname, $email, $hash);
+    $stmt->execute();
+    back('success', 'Account created! You can sign in now.');
+} catch (mysqli_sql_exception $ex) {
+    // 1062 = duplicate email
+    back('danger', $ex->getCode() == 1062 ? 'That email is already registered.' : 'Could not create account.');
+}
