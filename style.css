@@ -1,0 +1,16 @@
+/* Set the default page appearance */
+body {
+    background-color: #f3f6fb;
+    color: #1c2941;
+}
+
+/* Style the product image placeholder */
+.product-image {
+    height: 180px;
+    background-color: #e8edf2;
+}
+
+/* Add a small shadow when hovering over products */
+.card:hover {
+    box-shadow: 0 4px 12px #0002;
+}
