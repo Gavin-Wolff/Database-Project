@@ -42,6 +42,9 @@ $result = $conn->query($sql);
                 <a href="admin.php" class="text-white text-decoration-none">
                     Admin Profile
                 </a>
+                <a href="logout.php" class="text-white text-decoration-none">
+                    Log Out
+                </a>
             </nav>
         </div>
     </header>
