@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+include("session.php");
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +17,12 @@ require_once 'db.php';
     <header class="bg-success text-white p-2">
         <div class="container d-flex justify-content-between align-items-center">
             <h1>Registration</h1>
+            <nav class="d-flex">
+                <?php if(isset($_SESSION['email'])) {
+                        echo "Welcome, " . $_SESSION['email'] . "!";
+                    } else {echo "<h1>NO DIDNT WORK</h1>"; }
+                ?>
+            </nav>
             <nav class="d-flex gap-5">
                 <a href="login.php" class="text-white text-decoration-none">Login</a>
                 <a href="index.php" class="text-white text-decoration-none">Home</a>
