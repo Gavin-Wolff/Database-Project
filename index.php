@@ -38,7 +38,11 @@ $result = $conn->query($sql);
                 <a href="register.php" class="text-white text-decoration-none">
                     Register
                 </a>
-            <nav>
+
+                <a href="admin.php" class="text-white text-decoration-none">
+                    Admin Profile
+                </a>
+            </nav>
         </div>
     </header>
 
