@@ -4,6 +4,7 @@ require_once 'db.php';
 // Retrieve all stores from the database
 $sql = "SELECT Name, HoursOfOperation FROM store ORDER BY Name";
 $result = $conn->query($sql);
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -27,31 +28,45 @@ $result = $conn->query($sql);
             <h1 class="text-white">Smartbase Store Finder</h1>
 
             <nav class="d-flex gap-5">
+
+                <?php if(isset($_SESSION["name"])){
+                    echo "<p>Hi, " . $_SESSION["name"] . "!";
+                    echo "<p></p>";
+                    echo "<p></p>";
+                }?>
+
                 <a href="search.php" class="text-white text-decoration-none">
                     Search
                 </a>
 
-                <a href="login.php" class="text-white text-decoration-none">
-                    Log In
-                </a>
+                <?php if(!(isset($_SESSION["name"]))){
+                    echo '<a href="login.php" class="text-white text-decoration-none">
+                        Log In
+                    </a>';
+                    echo '<a href="register.php" class="text-white text-decoration-none">
+                        Register
+                    </a>';
+                }?>
 
-                <a href="register.php" class="text-white text-decoration-none">
-                    Register
-                </a>
+                
+                <?php if(isset($_SESSION["name"])) {
+                    echo '<a href="admin.php" class="text-white text-decoration-none">
+                        Account Management
+                    </a>';
 
-                <a href="admin.php" class="text-white text-decoration-none">
-                    Admin Profile
-                </a>
-                <a href="logout.php" class="text-white text-decoration-none">
-                    Log Out
-                </a>
+                    echo '<a href="logout.php" class="text-white text-decoration-none">
+                        Log Out
+                    </a>';
+                }?>
+
             </nav>
         </div>
     </header>
 
     <main class="container py-2 flex-grow-1">
-
+        <br>
         <h2>Select a Store</h2>
+        <br>
 
         <div class="storeGrid">
 
@@ -92,3 +107,4 @@ $result = $conn->query($sql);
 
 </body>
 </html>
+
