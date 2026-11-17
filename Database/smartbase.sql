@@ -92,6 +92,14 @@ CREATE TABLE `users` (
     `CreateTime` datetime DEFAULT CURRENT_TIMESTAMP NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Table structure for table `cart`
+
+CREATE TABLE `cart` (
+    `UID` int(11) NOT NULL,
+    `StoreID` int(11) NOT NULL,
+    `ItemID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -131,6 +139,11 @@ ALTER TABLE `users`
     ADD PRIMARY KEY (`UID`),
     ADD UNIQUE KEY (`Email`);
 
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+    ADD PRIMARY KEY (`UID`, `StoreID`, `ItemID`);
 --
 -- AUTO_INCREMENT for dumped tables
 --
