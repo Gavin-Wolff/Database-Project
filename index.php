@@ -50,6 +50,10 @@ session_start();
 
                 
                 <?php if(isset($_SESSION["name"])) {
+                    echo '<a href="cart.php" class="text-white text-decoration-none">
+                        Shopping Cart
+                    </a>';
+                    
                     echo '<a href="admin.php" class="text-white text-decoration-none">
                         Account Management
                     </a>';
@@ -107,4 +111,3 @@ session_start();
 
 </body>
 </html>
-
