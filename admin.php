@@ -1,13 +1,28 @@
 <?php
-require_once 'db.php';
-include("session.php");
+    require_once 'db.php';
+    session_start();
+    $name = $_SESSION["name"];
+    $email = $_SESSION["email"];
+    try {
+        $sql = "SELECT LName, Password FROM users WHERE Email='$email'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_row();
+        $lname = $row[0];
+        $hash = $row[1];
+    } catch (Throwable $e){
+        print_r($e);
+        header("Location: index.php");
+        exit;
+    }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registration</title>
+    <title>Account Management</title>
     <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,12 +31,9 @@ include("session.php");
 
     <header class="bg-success text-white p-2">
         <div class="container d-flex justify-content-between align-items-center">
-            <h1>Registration</h1>
+            <h1>Account Management</h1>
             <nav class="d-flex">
-                <?php if(isset($_SESSION['email'])) {
-                        echo "Welcome, " . $_SESSION['email'] . "!";
-                    } else {echo "<h1>NO DIDNT WORK</h1>"; }
-                ?>
+
             </nav>
             <nav class="d-flex gap-5">
                 <a href="login.php" class="text-white text-decoration-none">Login</a>
@@ -39,21 +51,21 @@ include("session.php");
                     <div class="card-body p-4">
                         <h3 class="text-center mb-4">Update your Information</h3>
                         
-                        <form method="POST" action="">
+                        <form action="admin_handler.php" method="post">
                             
                             <div class="mb-3">
                                 <label for="fname" class="form-label fw-semibold">First Name</label>
-                                <input type="text" class="form-control bg-light" id="fname" name="fname" placeholder="Change your first name">
+                                <input type="text" class="form-control bg-light" id="fname" name="fname" placeholder="<?php echo $name;?>">
                             </div>
                             
                             <div class="mb-3">
                                 <label for="lname" class="form-label fw-semibold">Last Name</label>
-                                <input type="text" class="form-control bg-light" id="lname" name="lname" placeholder="Change your last name">
+                                <input type="text" class="form-control bg-light" id="lname" name="lname" placeholder="<?php echo $lname;?>">
                             </div>
                             
                             <div class="mb-3">
                                 <label for="email" class="form-label fw-semibold">Email Address</label>
-                                <input type="email" class="form-control bg-light" id="email" name="email" placeholder="Change your email address">
+                                <input type="email" class="form-control bg-light" id="email" name="email" placeholder="<?php echo $email;?>">
                             </div>
                             
                             <div class="mb-4">
@@ -77,3 +89,4 @@ include("session.php");
 
 </body>
 </html>
+
