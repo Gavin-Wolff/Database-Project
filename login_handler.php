@@ -15,7 +15,8 @@
             $hash = $row[0];
             $name = $row[1];
             if(password_verify($password, $hash)) {
-                $_SESSION["email"] = $name;
+                $_SESSION["email"] = $email;
+                $_SESSION["name"] = $name;
                 header("Location: index.php");
             } else {
                 header("Location: login.php");
@@ -34,3 +35,4 @@
     }
 
 ?>
+
