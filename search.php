@@ -3,6 +3,42 @@ require_once 'db.php';
 
 // Get the search keyword
 $keyword = $_GET['keyword'] ?? '';
+$selectedCity = $_GET['city'] ?? '';
+$selectedState = $_GET['state'] ?? '';
+$selectedCounty = $_GET['county'] ?? '';
+$selectedPriceRating = $_GET['priceRating'] ?? '';
+$selectedStockStatus = $_GET['stockStatus'] ?? '';
+
+// Get available cities
+$cities = $conn->query(
+    "SELECT DISTINCT City FROM location ORDER BY City"
+);
+
+// Get available states
+$states = $conn->query(
+    "SELECT DISTINCT State FROM location ORDER BY State"
+);
+
+// Get available counties
+$counties = $conn->query(
+    "SELECT DISTINCT County FROM location
+     WHERE County IS NOT NULL
+     ORDER BY County"
+);
+
+// Get available price ratings
+$priceRatings = $conn->query(
+    "SELECT DISTINCT PriceRating FROM store
+     WHERE PriceRating IS NOT NULL
+     ORDER BY PriceRating"
+);
+
+// Get available stock statuses
+$stockStatuses = $conn->query(
+    "SELECT DISTINCT StockStatus FROM storeitem
+     WHERE StockStatus IS NOT NULL
+     ORDER BY StockStatus"
+);
 
 // Get all stores
 $storeResult = $conn->query("SELECT StoreID, Name FROM store ORDER BY Name");
@@ -16,6 +52,17 @@ while ($store = $storeResult->fetch_assoc()) {
 // Get selected store IDs from the filter
 $selectedStores = $_GET['stores'] ?? [];
 
+if (!is_array($selectedStores)) {
+    $selectedStores = [];
+}
+
+$selectedStores = array_values(
+    array_filter(
+        array_map('intval', $selectedStores),
+        fn($id) => $id > 0
+    )
+);
+
 // If the user clicked a store on the home page, select it
 if (isset($_GET['store']) && empty($selectedStores)) {
     foreach ($stores as $store) {
@@ -26,29 +73,141 @@ if (isset($_GET['store']) && empty($selectedStores)) {
 }
 
 // Search for products
-$sql = "SELECT item.ItemID, item.ItemName, item.Description,
-               store.StoreID, store.Name, storeitem.Price
-        FROM item
+$sql = "WITH RECURSIVE category_tree AS (
+            -- Find categories matching the search
+            SELECT ItemID
+            FROM item
+            WHERE ItemType = 'Category'
+            AND ItemName LIKE ?
+
+            UNION
+
+            -- Find all children of matching categories
+            SELECT child.ItemID
+            FROM item child
+            JOIN category_tree parent
+                ON child.ParentItemID = parent.ItemID
+
+        ),
+        -- Find products matching the keyword
+        -- OR products belonging to matching categories
+        matching_products AS (
+
+            SELECT ItemID
+            FROM item
+            WHERE ItemType = 'Product'
+            AND ItemName LIKE ?
+
+            UNION
+
+            SELECT i.ItemID
+            FROM item i
+            JOIN category_tree c
+                ON i.ItemID = c.ItemID
+            WHERE i.ItemType = 'Product'
+
+        )
+        SELECT
+            item.ItemID,
+            item.ItemName,
+            item.Description,
+            store.StoreID,
+            store.Name,
+            store.PriceRating,
+            location.City,
+            location.State,
+            location.County,
+            storeitem.Price,
+            storeitem.StockStatus
+
+        FROM matching_products
+
+        JOIN item
+            ON matching_products.ItemID = item.ItemID
+
         LEFT JOIN storeitem
             ON item.ItemID = storeitem.ItemID
+
         LEFT JOIN store
             ON storeitem.StoreID = store.StoreID
-        WHERE item.ItemType = 'Product'
-        AND item.ItemName LIKE ?";
 
-// If stores are selected, only show their prices
+        LEFT JOIN location
+            ON store.LocationID = location.LocationID
+
+        WHERE 1=1
+    ";
+
+// Start with the two keyword parameters from the recursive query
+$search = "%$keyword%";
+
+$params = [$search, $search];
+$types = "ss";
+
+// Filter by selected stores
 if (!empty($selectedStores)) {
-    $ids = implode(',', array_map('intval', $selectedStores));
-    $sql .= " AND store.StoreID IN ($ids)";
+    $placeholders = implode(
+        ',',
+        array_fill(0, count($selectedStores), '?')
+    );
+
+    $sql .= " AND store.StoreID IN ($placeholders)";
+
+    foreach ($selectedStores as $storeID) {
+        $params[] = (int)$storeID;
+        $types .= "i";
+    }
+}
+
+// Filter by city
+if ($selectedCity != '') {
+    $sql .= " AND location.City = ?";
+    $params[] = $selectedCity;
+    $types .= "s";
+}
+
+// Filter by state
+if ($selectedState != '') {
+    $sql .= " AND location.State = ?";
+    $params[] = $selectedState;
+    $types .= "s";
+}
+
+// Filter by county
+if ($selectedCounty != '') {
+    $sql .= " AND location.County = ?";
+    $params[] = $selectedCounty;
+    $types .= "s";
+}
+
+// Filter by price rating
+if ($selectedPriceRating != '') {
+    $sql .= " AND store.PriceRating = ?";
+    $params[] = (int)$selectedPriceRating;
+    $types .= "i";
+}
+
+// Filter by stock status
+if ($selectedStockStatus != '') {
+    $sql .= " AND storeitem.StockStatus = ?";
+    $params[] = $selectedStockStatus;
+    $types .= "s";
 }
 
 $sql .= " ORDER BY item.ItemName";
 
+// Prepare the SQL statement
 $stmt = $conn->prepare($sql);
 
-$search = "%$keyword%";
-$stmt->bind_param("s", $search);
+// Bind all parameters
+$bindParams = [$types];
 
+foreach ($params as $key => $value) {
+    $bindParams[] = &$params[$key];
+}
+
+call_user_func_array([$stmt, 'bind_param'], $bindParams);
+
+// Execute the query
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -116,7 +275,7 @@ $suggestions = $conn->query(
                 <a href="register.php" class="text-white text-decoration-none">
                     Register
                 </a>
-            <nav>
+            </nav>
         </div>
     </header>
 
@@ -136,13 +295,6 @@ $suggestions = $conn->query(
                 list="productSuggestions"
             >
 
-            <!-- Product suggestions -->
-            <datalist id="productSuggestions">
-                <?php while ($item = $suggestions->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($item['ItemName']) ?>">
-                <?php endwhile; ?>
-            </datalist>
-
             <button class="btn btn-success">
                 Search
             </button>
@@ -160,7 +312,130 @@ $suggestions = $conn->query(
         <div class="card mb-4">
             <div class="card-body">
 
+                <h5>Filters</h5>
+
+                <div class="row g-3">
+
+                    <!-- City Filter -->
+                    <div class="col-md-4">
+                        <label for="city" class="form-label">City</label>
+
+                        <select name="city" id="city" class="form-select">
+                            <option value="">All Cities</option>
+
+                            <?php while ($city = $cities->fetch_assoc()): ?>
+
+                                <option value="<?= htmlspecialchars($city['City']) ?>"
+                                    <?= $selectedCity == $city['City'] ? 'selected' : '' ?>>
+
+                                    <?= htmlspecialchars($city['City']) ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+                    </div>
+
+
+                    <!-- State Filter -->
+                    <div class="col-md-4">
+                        <label for="state" class="form-label">State</label>
+
+                        <select name="state" id="state" class="form-select">
+                            <option value="">All States</option>
+
+                            <?php while ($state = $states->fetch_assoc()): ?>
+
+                                <option value="<?= htmlspecialchars($state['State']) ?>"
+                                    <?= $selectedState == $state['State'] ? 'selected' : '' ?>>
+
+                                    <?= htmlspecialchars($state['State']) ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+                    </div>
+
+
+                    <!-- County Filter -->
+                    <div class="col-md-4">
+                        <label for="county" class="form-label">County</label>
+
+                        <select name="county" id="county" class="form-select">
+                            <option value="">All Counties</option>
+
+                            <?php while ($county = $counties->fetch_assoc()): ?>
+
+                                <option value="<?= htmlspecialchars($county['County']) ?>"
+                                    <?= $selectedCounty == $county['County'] ? 'selected' : '' ?>>
+
+                                    <?= htmlspecialchars($county['County']) ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+                    </div>
+
+
+                    <!-- Price Rating Filter -->
+                    <div class="col-md-6">
+                        <label for="priceRating" class="form-label">
+                            Price Rating
+                        </label>
+
+                        <select name="priceRating" id="priceRating" class="form-select">
+                            <option value="">All Price Ratings</option>
+
+                            <?php while ($rating = $priceRatings->fetch_assoc()): ?>
+
+                                <option value="<?= $rating['PriceRating'] ?>"
+                                    <?= $selectedPriceRating == $rating['PriceRating'] ? 'selected' : '' ?>>
+
+                                    <?= $rating['PriceRating'] ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+                    </div>
+
+
+                    <!-- Stock Status Filter -->
+                    <div class="col-md-6">
+                        <label for="stockStatus" class="form-label">
+                            Stock Status
+                        </label>
+
+                        <select name="stockStatus" id="stockStatus" class="form-select">
+                            <option value="">All Stock Statuses</option>
+
+                            <?php while ($status = $stockStatuses->fetch_assoc()): ?>
+
+                                <option value="<?= htmlspecialchars($status['StockStatus']) ?>"
+                                    <?= $selectedStockStatus == $status['StockStatus'] ? 'selected' : '' ?>>
+
+                                    <?= htmlspecialchars($status['StockStatus']) ?>
+
+                                </option>
+
+                            <?php endwhile; ?>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <hr>
+
                 <h5>Filter by Store</h5>
+
+                <!-- Keep your existing store checkboxes here -->
 
                 <?php foreach ($stores as $store): ?>
 
